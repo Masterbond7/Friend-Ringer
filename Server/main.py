@@ -1,10 +1,19 @@
 # Importing libraries
 print("Importing Libraries")
 import socket
-import json
+import os, json
 
 # Creating data variable
 data = []
+
+# Checking if data file exists, if it does, load and display data
+print("Checking if data file exists")
+if os.path.isfile("data.json"):
+    print("Loading data")
+    datafile = open("data.json", 'r')
+    data = json.load(datafile)
+    datafile.close()
+    print("Loaded data: {data}".format(data=data), end="\n")
 
 # Starting socket
 print("Starting socket")
@@ -29,7 +38,7 @@ while True:
 
         # State that a device has connected
         print("Connected to: {ip}:{port}".format(ip=address[0], port=address[1]))
-        
+
         # Get the name and ID data and store/update it in the data variable
         clientdata["id"], clientdata["name"] = client.recv(1024).decode().replace("\r\n", "").split("|")
         if not any(userdata["id"] == clientdata["id"] for userdata in data):
@@ -48,7 +57,7 @@ while True:
 
         # Close the connection
         client.close()
-    
+
     # Stop errors from crashing the program (mostly to stop me being stupid while manually testing)
     except Exception as e:
         print("An error has occurred,"+str(e))
