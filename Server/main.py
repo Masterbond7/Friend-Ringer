@@ -1,8 +1,9 @@
 # Importing libraries
 print("Importing Libraries")
 import socket
+import json
 
-# Creating data
+# Creating data variable
 data = []
 
 # Starting socket
@@ -17,7 +18,7 @@ server.bind((host, port))
 
 # Start listening
 print("Listening on port {port}".format(port=port))
-server.listen(1)
+server.listen(5)
 
 # Main loop
 while True:
@@ -35,6 +36,11 @@ while True:
             data.append(clientdata)
         else:
             data[int(clientdata["id"])] = clientdata
+
+        # Save the data in a file
+        datafile = open("data.json", 'w')
+        json.dump(data, datafile)
+        datafile.close()
 
         # Display the newly acquired information as well as all the data stored
         print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
