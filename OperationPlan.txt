@@ -4,9 +4,11 @@ Server:
 		- If there is a connection display the node as online
 		- If there is no connection for a set time (30 secs) display the node as offline
 	- When the ring button is pressed on the website wait store that data in a variable, when the node connects, tell it to ring
+	- If a node sends an init signal give it an ID
 
 Nodes:
 	- Connect to server every ~15 secs to check in
 		- If the server cannot connect, show a red led
 		- If there is a connection, send the node's ID and see if it has been rang
 			- If it has, activate a peizo/bell/something else
+		- To get ID send init signal

@@ -26,8 +26,8 @@ print("Binding socket")
 server.bind((host, port))
 
 # Start listening
-print("Listening on port {port}".format(port=port))
 server.listen(5)
+print("Listening on port {port}".format(port=port))
 
 # Main loop
 while True:
@@ -39,21 +39,29 @@ while True:
         # State that a device has connected
         print("Connected to: {ip}:{port}".format(ip=address[0], port=address[1]))
 
-        # Get the name and ID data and store/update it in the data variable
-        clientdata["id"], clientdata["name"] = client.recv(1024).decode().replace("\r\n", "").split("|")
-        if not any(userdata["id"] == clientdata["id"] for userdata in data):
-            data.append(clientdata)
+        # Receive the message from the arduino
+        message = client.recv(1024).decode().replace("\r\n", "")
+        if message == "init":
+            # Give out an ID
+            newID = str(len(data))
+            client.send(newID.encode("ASCII"))
+            print("Given out id {id}".format(id=newID))
         else:
-            data[int(clientdata["id"])] = clientdata
+            # Get the name and ID data and store/update it in the data variable
+            clientdata["id"], clientdata["name"] = message.split("|")
+            if not any(userdata["id"] == clientdata["id"] for userdata in data):
+                data.append(clientdata)
+            else:
+                data[int(clientdata["id"])] = clientdata
+            
+            # Display the newly acquired information as well as all the data stored
+            print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
+            print(data, end="\n\n")
 
         # Save the data in a file
         datafile = open("data.json", 'w')
         json.dump(data, datafile)
         datafile.close()
-
-        # Display the newly acquired information as well as all the data stored
-        print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
-        print(data, end="\n\n")
 
         # Close the connection
         client.close()
