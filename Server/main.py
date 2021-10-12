@@ -3,6 +3,8 @@ print("Importing Libraries")
 import socket                # Networking
 import os, json              # Saving and loading data
 from threading import Thread # Multithreading
+from flask import Flask      # Web server
+import waitress              # Web server
 
 from network_handler import handle_connection
 
@@ -51,6 +53,17 @@ def thread_networking():
     # Close socket
     server.close() # NOTE: this code is unreachable
 
+# Defining flask
+website = Flask(__name__)
+
+@website.route('/')
+def index():
+    return "Hello World!"
+
+
 if __name__ == "__main__":
-    networking_thread = Thread(target=thread_networking, args=())
+    flask_thread = Thread(target=lambda: waitress.serve(website, host="0.0.0.0", port=5000))
+    networking_thread = Thread(target=thread_networking)
+
+    flask_thread.start(); print("Hosted website")
     networking_thread.start()
