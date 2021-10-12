@@ -2,14 +2,22 @@
 <html lang="en">
     <head>
         <title>Friend Ringer Website</title>
+        <script src="http://code.jquery.com/jquery-latest.js"></script>
+        <script>
+            function reloadDataDiv() {
+                $("#dataDiv").load(location.href + " #dataDiv>*", "");
+            } setInterval("reloadDataDiv();", 1000);
+        </script>
     </head>
     <body>
         <h1>Friend ringer</h1>
         <h3>Data:</h3>
-        <ul>
-            {% for entry in data %}
-                <li><h4>ID: {{ entry.id }} Name: {{ entry.name }}</h4></li>
-            {% endfor %}
-        </ul>
+        <div id="dataDiv">
+            <ul>
+                {% for entry in data %}
+                    <li><h4>ID: {{ entry.id }} Name: {{ entry.name }}</h4></li>
+                {% endfor %}
+            </ul>
+        </div>
     </body>
 </html>
