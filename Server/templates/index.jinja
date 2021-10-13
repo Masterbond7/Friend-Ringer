@@ -15,7 +15,8 @@
         <div id="dataDiv">
             <ul>
                 {% for entry in data %}
-                    <li><h4>ID: {{ entry.id }} Name: {{ entry.name }}</h4></li>
+                    <li><h4>ID: {{ entry.id }} Name: {{ entry.name }}<br>
+                    Last connection UNIX timestamp: {{entry.last_conn}}</h4></li>
                 {% endfor %}
             </ul>
         </div>

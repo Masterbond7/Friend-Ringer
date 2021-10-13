@@ -1,6 +1,7 @@
 # Importing libraries
 import socket   # Networking
 import os, json # Saving and loading data
+import time     # Timestamp
 
 def handle_connection(server, data):
     try:
@@ -25,8 +26,9 @@ def handle_connection(server, data):
             client.send(newID.encode("ASCII"))
             print("Given out id {id}".format(id=newID))
 
-            # Get their name
+            # Clientdata
             command, clientdata["name"] = message.split("|")
+            clientdata["last_conn"] = int(time.time())
 
             # Add their name to the database
             data.append(clientdata)
@@ -43,8 +45,11 @@ def handle_connection(server, data):
 
         # Handle edit command (format: edit|<id>|<new name>)
         elif command == "edit":
-            # Split the message, get the name and ID data, and store/update it in the data variable
+            # Clientdata
             command, clientdata["id"], clientdata["name"] = message.split("|")
+            clientdata["last_conn"] = int(time.time())
+
+            # Get the name and ID data, and store/update it in the data variable
             if not any(userdata["id"] == clientdata["id"] for userdata in data):
                 data.append(clientdata)
             else:
