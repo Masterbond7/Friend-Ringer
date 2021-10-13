@@ -15,33 +15,49 @@ def handle_connection(server, data):
 
         # Dissect the message
         clientdata = {}
-        clientdata["id"], clientdata["name"] = message.split("|")
+        command = message.split("|")[0] # Split the message and set the first string as command
 
-        # Handle init command
-        if clientdata["id"] == "init":
+        # Handle init command (format: init|<name>)
+        if command == "init":
             # Give out an ID
             newID = str(len(data))
             clientdata["id"] = newID
             client.send(newID.encode("ASCII"))
             print("Given out id {id}".format(id=newID))
 
+            # Get their name
+            command, clientdata["name"] = message.split("|")
+
             # Add their name to the database
             data.append(clientdata)
 
-        # Get the name and ID data and store/update it in the data variable
-        if not any(userdata["id"] == clientdata["id"] for userdata in data):
-            data.append(clientdata)
-        else:
-            data[int(clientdata["id"])] = clientdata
-        
-        # Display the newly acquired information as well as all the data stored
-        print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
-        print(data, end="\n\n")
+            # Display the newly acquired information as well as all the data stored
+            print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
+            print(data, end="\n\n")
 
-        # Save the data in a file
-        datafile = open("data.json", 'w')
-        json.dump(data, datafile)
-        datafile.close()
+            # Save the data in a file
+            datafile = open("data.json", 'w')
+            json.dump(data, datafile)
+            datafile.close()
+
+
+        # Handle edit command (format: edit|<id>|<new name>)
+        elif command == "edit":
+            # Split the message, get the name and ID data, and store/update it in the data variable
+            command, clientdata["id"], clientdata["name"] = message.split("|")
+            if not any(userdata["id"] == clientdata["id"] for userdata in data):
+                data.append(clientdata)
+            else:
+                data[int(clientdata["id"])] = clientdata
+        
+            # Display the newly acquired information as well as all the data stored
+            print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
+            print(data, end="\n\n")
+
+            # Save the data in a file
+            datafile = open("data.json", 'w')
+            json.dump(data, datafile)
+            datafile.close()
 
         # Close the connection
         client.close()
@@ -49,6 +65,10 @@ def handle_connection(server, data):
     # Stop errors from crashing the program (mostly to stop me being stupid while manually testing)
     except Exception as e:
         print("An error has occurred,"+str(e))
+        try: client.send("ERROR".encode("ASCII")); client.close()
+        except: print("Unable to inform client of error.")
+
+
     
     # Returning everything (just in case)
     return server, data
