@@ -75,7 +75,7 @@ def thread_is_active():
         if not data == []:
             UNIX_time = int(time.time())
             for entry in data:
-                if entry["last_conn"] + 15 <= UNIX_time:
+                if entry["last_conn"] + 30 <= UNIX_time:
                     entry["active"] = False
                 else:
                     entry["active"] = True

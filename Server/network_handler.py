@@ -18,7 +18,7 @@ def handle_connection(server, data):
         clientdata = {}
         command = message.split("|")[0] # Split the message and set the first string as command
 
-        # Handle init command (format: init|<name>)
+        # Handle init command (format: init|<name>) (returns: <id>)
         if command == "init":
             # Give out an ID
             newID = str(len(data))
@@ -30,6 +30,7 @@ def handle_connection(server, data):
             command, clientdata["name"] = message.split("|")
             clientdata["last_conn"] = int(time.time())
             clientdata["active"] = True
+            clientdata["ringing"] = False
 
             # Add their name to the database
             data.append(clientdata)
@@ -38,13 +39,13 @@ def handle_connection(server, data):
             print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
             print(data, end="\n\n")
 
-
-        # Handle edit command (format: edit|<id>|<new name>)
+        # Handle edit command (format: edit|<id>|<new name>) (returns: )
         elif command == "edit":
             # Clientdata
             command, clientdata["id"], clientdata["name"] = message.split("|")
             clientdata["last_conn"] = int(time.time())
             clientdata["active"] = True
+            clientdata["ringing"] = False
 
             # Get the name and ID data, and store/update it in the data variable
             if not any(userdata["id"] == clientdata["id"] for userdata in data):
@@ -56,6 +57,17 @@ def handle_connection(server, data):
             print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
             print(data, end="\n\n")
 
+        # Handle view command (format: view|<id>) (retruns: <ringing>)
+        elif command=="view":
+            # Split the message
+            command, clientdata["id"] = message.split("|")
+
+            # Make the user active
+            data[int(clientdata["id"])]["last_conn"] = int(time.time())
+            data[int(clientdata["id"])]["active"] = True
+
+            # Send the result (0/1)
+            client.send(str(int(data[int(clientdata["id"])]["ringing"])).encode("ASCII"))
 
         # Close the connection
         client.close()
