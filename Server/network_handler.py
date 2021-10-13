@@ -1,9 +1,10 @@
 # Importing libraries
 import socket   # Networking
-import os, json # Saving and loading data
 import time     # Timestamp
 
-def handle_connection(server, data):
+from load_data import load_data # Load data
+
+def handle_connection(server):
     try:
         # Accept connection
         client, address = server.accept()
@@ -13,6 +14,9 @@ def handle_connection(server, data):
 
         # Receive the message from the arduino
         message = client.recv(1024).decode().replace("\r\n", "")
+
+        # Load data
+        data = load_data()
 
         # Dissect the message
         clientdata = {}

@@ -17,7 +17,12 @@
                 {% for entry in data %}
                     <li><h4>ID: {{ entry.id }} Name: {{ entry.name }}<br>
                     Last connection UNIX timestamp: {{ entry.last_conn }}<br>
-                    Active: {{ entry.active }} Ringing: {{ entry.ringing }}</h4></li>
+                    Active: {{ entry.active }} Ringing: {{ entry.ringing }}</h4>
+                        <form action="/ring" method="post" role="form">
+                            <input type="hidden" id="id" name="id" value="{{ entry.id }}">
+                            <input type="submit" name="Ring..." value="{% if not entry.ringing %} Start Ringing {% else %} Stop Ringing {% endif %}">
+                        </form>
+                    </li>
                 {% endfor %}
             </ul>
         </div>

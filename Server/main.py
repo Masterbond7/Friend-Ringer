@@ -3,37 +3,18 @@ print("Importing Libraries")
 import socket                            # Networking
 import os, json                          # Saving and loading data
 from threading import Thread             # Multithreading
-from flask import Flask, render_template # Web server
+from flask import Flask, render_template, request # Web server
 import waitress                          # Web server
-import time                              # Timestamp & delay
+import time
+
+from werkzeug.utils import redirect                              # Timestamp & delay
 
 from network_handler import handle_connection
-
-
-# Defining function to load data
-def load_data():
-    # Checking if data file exists, if it does, load and display data
-    print("Checking if data file exists")
-    if os.path.isfile("data.json"):
-        print("Loading data")
-        datafile = open("data.json", 'r')
-        data = json.load(datafile)
-        datafile.close()
-        print("Loaded data: {data}".format(data=data), end="\n")
-    
-        # Return the data
-        return data
-    
-    else:
-        print("No data file")
-        return []
+from load_data import load_data
 
 
 # Defining network thread
 def thread_networking():
-    # Creating data variable
-    data = load_data()
-
     # Starting socket
     print("Starting socket")
     server = socket.socket()
@@ -51,7 +32,7 @@ def thread_networking():
     # Main networking loop
     ##old_data = []
     while True:
-        server, data = handle_connection(server, data)
+        server, data = handle_connection(server)
         if True:#not data == old_data:
             # Save the data in a file
             datafile = open("data.json", 'w')
@@ -96,6 +77,24 @@ website = Flask(__name__)
 def index():
     return render_template("index.jinja", data=load_data())
 
+@website.route('/ring', methods=['GET', 'POST'])
+def ring():
+    if request.method == 'GET':
+        return redirect("/")
+
+    elif request.method == 'POST':
+        data = load_data()
+        id = int(request.form['id'])
+
+        # Flip state
+        if data[id]["ringing"]: data[id]["ringing"] = False
+        else: data[id]["ringing"] = True
+
+        datafile = open("data.json", 'w')
+        json.dump(data, datafile)
+        datafile.close()
+
+        return redirect("/")
 
 if __name__ == "__main__":
     #flask_thread = Thread(target=lambda: waitress.serve(website, host="0.0.0.0", port=5000))
