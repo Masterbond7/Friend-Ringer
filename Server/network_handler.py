@@ -29,6 +29,7 @@ def handle_connection(server, data):
             # Clientdata
             command, clientdata["name"] = message.split("|")
             clientdata["last_conn"] = int(time.time())
+            clientdata["active"] = True
 
             # Add their name to the database
             data.append(clientdata)
@@ -37,17 +38,13 @@ def handle_connection(server, data):
             print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
             print(data, end="\n\n")
 
-            # Save the data in a file
-            datafile = open("data.json", 'w')
-            json.dump(data, datafile)
-            datafile.close()
-
 
         # Handle edit command (format: edit|<id>|<new name>)
         elif command == "edit":
             # Clientdata
             command, clientdata["id"], clientdata["name"] = message.split("|")
             clientdata["last_conn"] = int(time.time())
+            clientdata["active"] = True
 
             # Get the name and ID data, and store/update it in the data variable
             if not any(userdata["id"] == clientdata["id"] for userdata in data):
@@ -59,10 +56,6 @@ def handle_connection(server, data):
             print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
             print(data, end="\n\n")
 
-            # Save the data in a file
-            datafile = open("data.json", 'w')
-            json.dump(data, datafile)
-            datafile.close()
 
         # Close the connection
         client.close()
