@@ -15,12 +15,12 @@ def handle_connection(server):
         # Receive the message from the arduino
         message = client.recv(1024).decode().replace("\r\n", "")
 
-        # Load data
-        data = load_data()
-
         # Dissect the message
         clientdata = {}
         command = message.split("|")[0] # Split the message and set the first string as command
+
+        # Load data
+        data = load_data()
 
         # Handle init command (format: init|<name>) (returns: <id>)
         if command == "init":
@@ -72,6 +72,24 @@ def handle_connection(server):
 
             # Send the result (0/1)
             client.send(str(int(data[int(clientdata["id"])]["ringing"])).encode("ASCII"))
+
+
+        # Handle ring command (format: ring|<id>|<status>(0/1)) (returns: )
+        elif command=="ring":
+            # Split the message
+            command, clientdata["id"], clientdata["ringing"] = message.split("|")
+
+            # Set the ring status of the client
+            if clientdata["ringing"] == "0": data[int(clientdata["id"])]['ringing'] = False
+            if clientdata["ringing"] == "1": data[int(clientdata["id"])]['ringing'] = True
+
+            # Make the user active
+            data[int(clientdata["id"])]["last_conn"] = int(time.time())
+            data[int(clientdata["id"])]["active"] = True
+
+            # Display the newly acquired information as well as all the data stored
+            print("Connection ID: {id}, Name: {name}".format(id=clientdata["id"], name=clientdata["name"]))
+            print(data, end="\n\n")
 
         # Close the connection
         client.close()
