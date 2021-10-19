@@ -75,7 +75,7 @@ website = Flask(__name__)
 
 @website.route('/')
 def index():
-    return render_template("index.jinja", data=load_data())
+    return render_template("index.html", data=load_data())
 
 @website.route('/ring', methods=['GET', 'POST'])
 def ring():
@@ -95,6 +95,7 @@ def ring():
         datafile.close()
 
         return redirect("/")
+
 
 if __name__ == "__main__":
     #flask_thread = Thread(target=lambda: waitress.serve(website, host="0.0.0.0", port=5000))
