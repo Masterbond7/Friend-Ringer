@@ -1,0 +1,4 @@
+  0-31 :   WiFi SSID   # 32 Bytes
+ 32-94 : WiFi Password # 63 Bytes
+95-126 :   Username    # 32 Bytes
+   127 :      ID       #  1 Byte
