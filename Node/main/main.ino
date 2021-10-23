@@ -1,21 +1,30 @@
-// Include EEPROM header to allow access to the EEPROM's data
-#include <EEPROM.h>
+// Including the WiFi header
+#include <ESP8266WiFi.h>
 
-// Variable to store a number from the EEPROM
-int old_value;
+const char* ssid     = "SSID";     // The SSID (name) of the Wi-Fi network you want to connect to
+const char* password = "PASSWORD"; // The password for the Wi-Fi network
 
 void setup() {
     Serial.begin(9600); // Start serial
-    
-    EEPROM.begin(1);    // Initialize the EEPROM for 1 byte of storage
-    old_value = EEPROM.read(0); // Read the value into old_value
-    EEPROM.write(0, old_value+1); // Increment the stored value by one
+    delay(10);
+    Serial.println('\n');
 
-    // Write new data to the EEPROM and end connection
-    EEPROM.commit();
-    EEPROM.end();
+    // Connect to the network
+    WiFi.begin(ssid, password);
+    Serial.print("Connecting to ");
+    Serial.print(ssid); Serial.println(" ...");
+
+    // Wait for the WiFi to connect
+    int i = 0;
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.print(++i); Serial.print(' ');
+    }
+
+    Serial.println('\n');
+    Serial.println("Connection established!");  
+    Serial.print("IP address:\t");
+    Serial.println(WiFi.localIP());         // Send the IP address of the ESP8266 to the computer
 }
 
-void loop() {
-    Serial.println(old_value); // Continuously display the old value over serial
-}
+void loop() { }
